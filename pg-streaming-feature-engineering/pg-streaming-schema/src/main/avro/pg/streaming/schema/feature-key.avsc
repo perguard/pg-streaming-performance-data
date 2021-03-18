@@ -1,0 +1,11 @@
+{
+  "namespace": "pg.streaming.schema",
+  "type": "record",
+  "name": "FeatureKey",
+  "fields": [
+    {"name": "hostname", "type": "string"},
+    {"name": "metric", "type": "pg.trace.model.TraceMetric"},
+    {"name": "measure", "type": "pg.trace.model.TraceMeasure"},
+    {"name": "unit", "type": "pg.trace.model.TraceUnit"}
+  ]
+}

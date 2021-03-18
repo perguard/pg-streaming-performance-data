@@ -1,0 +1,6 @@
+rootProject.name = "pg-streaming-feature-engineering"
+include "pg-streaming-schema"
+include "pg-streaming-feature-extraction"
+include "pg-streaming-target-extraction"
+include "pg-streaming-labeling"
+include "integration-test"

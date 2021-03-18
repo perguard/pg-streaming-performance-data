@@ -1,0 +1,6 @@
+{
+  "namespace": "pg.trace.model",
+  "type": "enum",
+  "name": "TraceMeasure",
+  "symbols": ["UTILIZATION", "THROUGHPUT", "RESPONSE_TIME", "UNKNOWN"]
+}

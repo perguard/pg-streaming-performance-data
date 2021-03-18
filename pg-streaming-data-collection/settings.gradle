@@ -1,0 +1,3 @@
+rootProject.name = "pg-streaming-data-collection"
+include "pg-trace-schema"
+include "pg-streaming-trace-collection"
