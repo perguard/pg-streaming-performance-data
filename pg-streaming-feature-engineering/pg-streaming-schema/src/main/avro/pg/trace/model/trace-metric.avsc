@@ -1,0 +1,6 @@
+{
+  "namespace": "pg.trace.model",
+  "type": "enum",
+  "name": "TraceMetric",
+  "symbols": ["CPU", "DISK_READ", "DISK_WRITE", "MEMORY", "NETWORK_IN", "NETWORK_OUT", "UNKNOWN"]
+}

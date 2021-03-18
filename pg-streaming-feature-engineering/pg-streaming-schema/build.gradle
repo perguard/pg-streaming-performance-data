@@ -1,0 +1,21 @@
+plugins {
+    id 'com.commercehub.gradle.plugin.avro' version '0.9.1'
+}
+
+apply plugin: 'java-library'
+apply plugin: 'com.commercehub.gradle.plugin.avro'
+
+version = '1.0-SNAPSHOT'
+
+dependencies {
+    api 'org.apache.avro:avro:1.10.1'
+    api 'io.confluent:kafka-streams-avro-serde:6.0.1'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'build/generated-main-avro-java'
+        }
+    }
+}

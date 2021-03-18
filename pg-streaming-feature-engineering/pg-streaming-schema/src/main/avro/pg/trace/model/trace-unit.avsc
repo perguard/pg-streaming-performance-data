@@ -1,0 +1,6 @@
+{
+  "namespace": "pg.trace.model",
+  "type": "enum",
+  "name": "TraceUnit",
+  "symbols": ["COUNT", "COUNT_PER_SECOND", "BYTES", "BYTES_PER_SECOND", "KILOBYTES", "KILOBYTES_PER_SECOND", "MEGABYTES", "MEGABYTES_PER_SECOND", "PERCENT", "MILLISECONDS", "SECONDS", "UNKNOWN"]
+}

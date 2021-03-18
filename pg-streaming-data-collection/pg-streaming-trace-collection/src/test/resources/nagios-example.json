@@ -1,0 +1,76 @@
+{
+  "@attributes": {
+    "id": "3349"
+  },
+  "instance_id": "1",
+  "service_id": "291",
+  "host_id": "289",
+  "host_name": "Cassandra",
+  "host_alias": "Cassandra",
+  "name": "Memory Usage",
+  "host_display_name": {
+
+  },
+  "host_address": "test.com",
+  "display_name": "Memory Usage",
+  "status_update_time": "2020-05-11 19:25:16",
+  "status_text": "OK: Percent was 28.10 %",
+  "status_text_long": {
+
+  },
+  "current_state": "0",
+  "performance_data": "&apos;percent&apos;=28.10%;;;",
+  "should_be_scheduled": "1",
+  "check_type": "0",
+  "last_state_change": "2020-05-08 15:47:22",
+  "last_hard_state_change": "2020-05-08 15:47:22",
+  "last_hard_state": "0",
+  "last_time_ok": "2020-05-11 19:21:01",
+  "last_time_warning": "1970-01-01 01:00:00",
+  "last_time_critical": "2020-05-08 15:42:18",
+  "last_time_unknown": "2020-05-08 15:47:22",
+  "last_notification": "2020-05-08 15:47:22",
+  "next_notification": "2020-05-08 16:47:22",
+  "no_more_notifications": "0",
+  "acknowledgement_type": "0",
+  "current_notification_number": "1",
+  "process_performance_data": "1",
+  "obsess_over_service": "1",
+  "event_handler_enabled": "1",
+  "modified_service_attributes": "0",
+  "event_handler": {
+
+  },
+  "check_command": "check_xi_ncpa!-t &apos;qupetoken&apos; -P 5693 -M memory\/virtual\/percent !!!!!!!",
+  "normal_check_interval": "5",
+  "retry_check_interval": "1",
+  "check_timeperiod_id": "134",
+  "icon_image": {
+
+  },
+  "icon_image_alt": {
+
+  },
+  "has_been_checked": "1",
+  "current_check_attempt": "1",
+  "max_check_attempts": "5",
+  "last_check": "2020-05-11 19:21:01",
+  "next_check": "2020-05-11 19:25:58",
+  "state_type": "1",
+  "notifications_enabled": "1",
+  "problem_acknowledged": "0",
+  "flap_detection_enabled": "1",
+  "is_flapping": "0",
+  "percent_state_change": "0",
+  "latency": "0.00074",
+  "execution_time": "0.45511",
+  "scheduled_downtime_depth": "0",
+  "passive_checks_enabled": "1",
+  "active_checks_enabled": "1",
+  "notes_url": {
+
+  },
+  "action_url": {
+
+  }
+}

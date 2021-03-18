@@ -1,0 +1,89 @@
+version: "3.9"
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      HOSTNAME_COMMAND:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENERS: INSIDE://:9093,OUTSIDE://:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "pg-traces-telegraf:1:1"
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:6.0.0
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:9093'
+      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: WARN
+      SCHEMA_REGISTRY_SCHEMA_COMPATIBILITY_LEVEL: none
+
+  pg-streaming-trace-collection:
+    image: pg-streaming-trace-collection
+    hostname: pg-streaming-trace-collection
+    container_name: pg-streaming-trace-collection
+    ports:
+      - "8082:8080"
+    depends_on:
+      - kafka
+      - schema-registry
+    environment:
+      kafka.bootstrap-servers: "kafka:9093"
+      kafka.group-id: "pg-streaming-trace-collection"
+      kafka.input-topic: "pg-traces-telegraf"
+      kafka.input-topic-partitions: 1
+      kafka.input-topic-replication-factor: 1
+      kafka.output-topic: "pg-traces-system"
+      kafka.output-topic-partitions: 1
+      kafka.output-topic-replication-factor: 1
+      collection.source: "telegraf"
+      schema.registry.url: "http://schema-registry:8081"
+
+  telegraf:
+    image: telegraf
+    container_name: telegraf
+    depends_on:
+      - kafka
+    volumes:
+      - ./pg-streaming-trace-collection/src/test/resources/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /:/hostfs:ro
+    environment:
+      - HOST_ETC=/hostfs/etc
+      - HOST_PROC=/hostfs/proc
+      - HOST_SYS=/hostfs/sys
+      - HOST_VAR=/hostfs/var
+      - HOST_RUN=/hostfs/run
+      - HOST_MOUNT_PREFIX=/hostfs
+    profiles: [ "telegraf" ]
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    restart: "no"
+    ports:
+      - 9000:9000
+    environment:
+      KAFKA_BROKERCONNECT: kafka:9093
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+    depends_on:
+      - kafka
+    profiles: [ "debug" ]

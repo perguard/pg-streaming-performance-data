@@ -1,0 +1,31 @@
+version = "1.0-SNAPSHOT"
+
+apply plugin: "com.bmuschko.docker-java-application"
+apply plugin: "com.github.johnrengelman.shadow"
+
+dependencies {
+    implementation project(":pg-streaming-schema")
+}
+
+jar {
+    manifest {
+        attributes(
+                "Class-Path": configurations.compileClasspath.collect { it.getName() }.join(" "),
+                "Main-Class": "pg.streaming.labeling.LabelingKafkaStreams"
+        )
+    }
+}
+
+shadowJar {
+    archiveBaseName = "pg-streaming-labeling-standalone"
+    archiveClassifier = ""
+}
+
+docker {
+    javaApplication {
+        baseImage = "openjdk:8-jre-slim"
+        maintainer = "Johannes Kross <kross@fortiss.org>"
+        images = ["pg-streaming-labeling:" + project.version, "pg-streaming-labeling:latest"]
+        // jvmArgs = ["-Xms256m", "-Xmx2048m"]  // tbd
+    }
+}

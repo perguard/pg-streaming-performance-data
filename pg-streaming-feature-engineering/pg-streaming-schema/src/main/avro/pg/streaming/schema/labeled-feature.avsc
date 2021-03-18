@@ -1,0 +1,19 @@
+{
+  "namespace": "pg.streaming.schema",
+  "type": "record",
+  "name": "LabeledFeature",
+  "fields": [
+    {"name": "minimum", "type": "double", "default": "0"},
+    {"name": "maximum", "type": "double", "default": "0"},
+    {"name": "mean", "type": "double", "default": "0"},
+    {"name": "standard_deviation", "type": "double", "default": "0"},
+    {"name": "percentile25", "type": "double", "default": "0"},
+    {"name": "median", "type": "double", "default": "0"},
+    {"name": "percentile75", "type": "double", "default": "0"},
+    {"name": "skewness", "type": "double", "default": "0"},
+    {"name": "kurtosis", "type": "double", "default": "0"},
+    {"name": "slope", "type": "double", "default": "0"},
+    {"name": "pearsons_correlation", "type": "double", "default": "0"},
+    {"name": "label", "type": "int", "default": 0}
+  ]
+}

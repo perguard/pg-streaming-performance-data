@@ -1,0 +1,120 @@
+version: "3.9"
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      HOSTNAME_COMMAND:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENERS: INSIDE://:9093,OUTSIDE://:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:6.0.0
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "kafka:9093"
+      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: WARN
+      SCHEMA_REGISTRY_SCHEMA_COMPATIBILITY_LEVEL: none
+
+  pg-streaming-feature-extraction:
+    image: pg-streaming-feature-extraction
+    hostname: pg-streaming-feature-extraction
+    container_name: pg-streaming-feature-extraction
+    ports:
+      - "8082:8080"
+    depends_on:
+      - kafka
+      - schema-registry
+    environment:
+      kafka.bootstrap-servers: "kafka:9093"
+      kafka.group-id: "pg-streaming-feature-extraction"
+      kafka.input-topic: "pg-traces-system"
+      kafka.input-topic-partitions: 1
+      kafka.input-topic-replication-factor: 1
+      kafka.output-topic: "pg-streaming-features"
+      kafka.output-topic-partitions: 1
+      kafka.output-topic-replication-factor: 1
+      app.window-duration-in-seconds: 1800
+      app.hopping-duration-in-seconds: 60
+      app.slowdown-threshold: 1000
+      schema-registry.url: "http://schema-registry:8081"
+
+  pg-streaming-target-extraction:
+    image: pg-streaming-target-extraction
+    hostname: pg-streaming-target-extraction
+    container_name: pg-streaming-target-extraction
+    ports:
+      - "8083:8080"
+    depends_on:
+      - kafka
+    environment:
+      kafka.bootstrap-servers: "kafka:9093"
+      kafka.group-id: "pg-streaming-target-extraction"
+      kafka.input-topic: "pg-traces-software"
+      kafka.input-topic-partitions: 1
+      kafka.input-topic-replication-factor: 1
+      kafka.output-topic: "pg-streaming-targets"
+      kafka.output-topic-partitions: 1
+      kafka.output-topic-replication-factor: 1
+      app.window-duration-in-seconds: 1800
+      app.hopping-duration-in-seconds: 60
+      app.slowdown-threshold: 1000
+
+  pg-streaming-labeling:
+    image: pg-streaming-labeling
+    hostname: pg-streaming-labeling
+    container_name: pg-streaming-labeling
+    ports:
+      - "8084:8080"
+    depends_on:
+      - kafka
+      - schema-registry
+      - pg-streaming-feature-extraction
+      - pg-streaming-target-extraction
+    environment:
+      kafka.bootstrap-servers: "kafka:9093"
+      kafka.group-id: "pg-streaming-labeling"
+      kafka.input-feature-topic: "pg-streaming-features"
+      kafka.input-feature-topic-partitions: 1
+      kafka.input-feature-topic-replication-factor: 1
+      kafka.input-target-topic: "pg-streaming-targets"
+      kafka.input-target-topic-partitions: 1
+      kafka.input-target-topic-replication-factor: 1
+      kafka.output-topic: "pg-streaming-labeled-data"
+      kafka.output-topic-partitions: 1
+      kafka.output-topic-replication-factor: 1
+      app.window-duration-in-seconds: 1800
+      app.hopping-duration-in-seconds: 60
+      schema-registry.url: "http://schema-registry:8081"
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    ports:
+      - 9000:9000
+    environment:
+      KAFKA_BROKERCONNECT: kafka:9093
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+    depends_on:
+      - kafka
+    profiles: [ "debug" ]

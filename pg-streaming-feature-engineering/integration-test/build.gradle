@@ -1,0 +1,23 @@
+version = "1.0-SNAPSHOT"
+
+apply plugin: "com.avast.gradle.docker-compose"
+
+dependencies {
+    implementation project(":pg-streaming-schema")
+    implementation "org.apache.commons:commons-math3:3.6.1"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.11.3"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.3"
+    implementation "io.zipkin.zipkin2:zipkin:2.22.1"
+}
+
+composeUp.dependsOn(':pg-streaming-feature-extraction:dockerBuildImage')
+composeUp.dependsOn(':pg-streaming-target-extraction:dockerBuildImage')
+composeUp.dependsOn(':pg-streaming-labeling:dockerBuildImage')
+
+dockerCompose {
+    useComposeFiles = ['docker-compose.integration-test.yml']
+    projectName = 'pg-streaming-integration-test'
+    includeDependencies = true
+}
+
+dockerCompose.isRequiredBy(test)

@@ -1,0 +1,33 @@
+version = "1.0-SNAPSHOT"
+
+apply plugin: "com.bmuschko.docker-java-application"
+apply plugin: "com.github.johnrengelman.shadow"
+
+dependencies {
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.11.3"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.3"
+    implementation "io.zipkin.zipkin2:zipkin:2.22.1"
+}
+
+jar {
+    manifest {
+        attributes(
+                "Class-Path": configurations.compileClasspath.collect { it.getName() }.join(" "),
+                "Main-Class": "pg.streaming.target.extraction.TargetExtractionKafkaStreams"
+        )
+    }
+}
+
+shadowJar {
+    archiveBaseName = "pg-streaming-target-extraction-standalone"
+    archiveClassifier = ""
+}
+
+docker {
+    javaApplication {
+        baseImage = "openjdk:8-jre-slim"
+        maintainer = "Johannes Kross <kross@fortiss.org>"
+        images = ["pg-streaming-target-extraction:" + project.version, "pg-streaming-target-extraction:latest"]
+        // jvmArgs = ["-Xms256m", "-Xmx2048m"]  // tbd
+    }
+}

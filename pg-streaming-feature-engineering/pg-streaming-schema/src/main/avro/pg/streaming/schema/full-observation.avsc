@@ -1,0 +1,9 @@
+{
+  "namespace": "pg.streaming.schema",
+  "type": "record",
+  "name": "FullObservation",
+  "fields": [
+    {"name": "feature_key", "type": "pg.streaming.schema.FeatureKey"},
+    {"name": "labeled_feature", "type": "pg.streaming.schema.LabeledFeature"}
+  ]
+}

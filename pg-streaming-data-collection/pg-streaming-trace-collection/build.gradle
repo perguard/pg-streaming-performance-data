@@ -1,0 +1,35 @@
+version = "0.6.0-SNAPSHOT"
+
+apply plugin: "com.bmuschko.docker-java-application"
+apply plugin: "com.github.johnrengelman.shadow"
+
+dependencies {
+    implementation project(":pg-trace-schema")
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.5'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.5'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.5'
+    testImplementation 'org.apache.commons:commons-io:1.3.2'
+}
+
+jar {
+    manifest {
+        attributes(
+                "Class-Path": configurations.compileClasspath.collect { it.getName() }.join(" "),
+                "Main-Class": "pg.streaming.trace.collection.TraceCollectionKafaStreams"
+        )
+    }
+}
+
+shadowJar {
+    archiveBaseName = "pg-streaming-trace-collection-standalone"
+    archiveClassifier = ""
+}
+
+docker {
+    javaApplication {
+        baseImage = 'openjdk:8-alpine'
+        maintainer = 'Johannes Kross "kross@fortiss.org"'
+        images = ['pg-streaming-trace-collection:' + project.version, 'pg-streaming-trace-collection:latest']
+        // jvmArgs = ['-Xms256m', '-Xmx2048m']  // tbd
+    }
+}
