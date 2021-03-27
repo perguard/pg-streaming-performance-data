@@ -19,6 +19,8 @@ setup(
     version='0.0.1',
     description='Machine learning demo on a stream of hopping windows',
     long_description='Example running Scikit-Multiflow with Faust, Avro and Schema Registry, and Docker Compose',
+    license="GNU Affero General Public License v3.0",
+    license_file="LICENSE",
     classifiers=[
         "Programming Language :: Python",
     ],
