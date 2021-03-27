@@ -1,0 +1,9 @@
+SIMPLE_SETTINGS = {
+    'OVERRIDE_BY_ENV': True,
+    'CONFIGURE_LOGGING': True,
+    'REQUIRED_SETTINGS': ('KAFKA_BOOTSTRAP_SERVER', 'SCHEMA_REGISTRY_URL', 'INPUT_TOPIC')
+}
+
+KAFKA_BOOTSTRAP_SERVER = "kafka://localhost:9092"
+SCHEMA_REGISTRY_URL = "http://localhost:8081"
+INPUT_TOPIC = "pg-streaming-labeled-data"
