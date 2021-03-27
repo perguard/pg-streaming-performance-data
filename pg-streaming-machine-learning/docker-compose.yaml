@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+
+  pg-streaming-machine-learning:
+    container_name: pg-streaming-machine-learning
+    tty: true
+    build: ""
+    command: ./run.sh
+    environment:
+      - KAFKA_BOOTSTRAP_SERVER=kafka://kafka:9093
+      - SCHEMA_REGISTRY_URL=http://schema-registry:8081
+      - INPUT_TOPIC=pg-streaming-labeled-data
+    depends_on:
+      - kafka
+      - schema-registry
+    profiles: [ "ml" ]
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    profiles: [ "infrastructure" ]
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      HOSTNAME_COMMAND:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENERS: INSIDE://:9093,OUTSIDE://:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "pg-streaming-labeled-data:1:1,pg-streaming-samples:1:1"
+    profiles: [ "infrastructure" ]
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:6.0.0
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "kafka:9093"
+      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: WARN
+      SCHEMA_REGISTRY_SCHEMA_COMPATIBILITY_LEVEL: none
+    profiles: [ "infrastructure" ]
